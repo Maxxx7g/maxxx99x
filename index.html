@@ -1,1 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diamond Giveaway — Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:#0f1720;
+      --muted:#9aa4b2;
+      --accent1:#00c2ff; /* neon blue */
+      --accent2:#ffbf2e; /* gold */
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --radius:14px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,194,255,0.06), transparent),
+                  radial-gradient(900px 500px at 90% 80%, rgba(255,191,46,0.04), transparent),
+                  var(--bg);
+      color:#dbe7ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+    }
+
+    /* NAVBAR */
+    .navbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      max-width:1100px;
+      margin:0 auto 28px;
+      padding:12px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      backdrop-filter: blur(6px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:44px;height:44px;border-radius:10px;display:grid;place-items:center;
+      background: linear-gradient(135deg,var(--accent1),var(--accent2));
+      box-shadow: 0 6px 18px rgba(0,194,255,0.08);
+      font-weight:800;color:#071019;font-size:18px;
+    }
+    .brand h1{margin:0;font-size:16px;letter-spacing:0.3px}
+    .nav-actions{display:flex;align-items:center;gap:10px}
+    .logout{
+      padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      cursor:pointer;font-weight:600;color:var(--accent2);
+      transition:transform .14s ease, box-shadow .14s ease;
+    }
+    .logout:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(255,191,46,0.08)}
+
+    /* LAYOUT */
+    .container{
+      max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start;
+    }
+    @media (max-width:920px){
+      .container{grid-template-columns:1fr;}
+    }
+
+    /* CARD */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);padding:22px;box-shadow: 0 8px 40px rgba(3,7,18,0.6);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .card h2{margin:0 0 8px;font-size:20px}
+    .card p{margin:0 0 18px;color:var(--muted);font-size:14px}
+
+    /* FORM */
+    form{display:flex;flex-direction:column;gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:13px;color:var(--muted)}
+    input[type="text"], select{
+      padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);
+      color:inherit;font-size:15px;outline:none;transition:box-shadow .15s ease, transform .12s ease;
+    }
+    input[type="text"]:focus, select:focus{box-shadow: 0 4px 22px rgba(0,194,255,0.06);transform:translateY(-2px)}
+
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn-send{
+      flex:1;padding:12px 16px;border-radius:12px;border:none;cursor:pointer;font-weight:700;font-size:15px;
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;box-shadow: 0 10px 30px rgba(0,194,255,0.08);
+      transition:transform .12s ease, filter .12s ease;
+    }
+    .btn-send:hover{transform:translateY(-3px);filter:brightness(1.02)}
+
+    .small-ghost{
+      padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass-2);font-weight:600;cursor:default
+    }
+
+    /* Transactions box */
+    .transactions{display:flex;flex-direction:column;gap:10px}
+    .tx-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02)}
+    .tx-left{display:flex;gap:10px;align-items:center}
+    .uid-chip{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);font-weight:700}
+    .tx-meta{color:var(--muted);font-size:13px}
+
+    /* empty state */
+    .empty{color:var(--muted);padding:18px;text-align:center;border-radius:10px;background:rgba(255,255,255,0.01)}
+
+    /* footer note */
+    .note{margin-top:12px;color:var(--muted);font-size:13px}
+
+    /* small tweaks */
+    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand">
+      <div class="logo">DG</div>
+      <div>
+        <h1>DiamondGive</h1>
+        <div style="font-size:12px;color:var(--muted)">Admin Dashboard</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div style="font-weight:700;color:var(--accent1);margin-right:10px">Dashboard</div>
+      <button class="logout" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- Left: Form Card -->
+    <section class="card">
+      <div class="top-row">
+        <div>
+          <h2>Send Diamonds</h2>
+          <p>Enter UID and select diamond package to send diamonds instantly (front‑end demo).</p>
+        </div>
+        <div class="small-ghost">Live Mode: <strong style="color:var(--accent2);">Demo</strong></div>
+      </div>
+
+      <form id="sendForm">
+        <div class="field">
+          <label for="uid">Player UID</label>
+          <input id="uid" type="text" placeholder="Enter Player UID" inputmode="numeric" pattern="[0-9]*" />
+        </div>
+
+        <div class="field">
+          <label for="amount">Diamond Amount</label>
+          <select id="amount">
+            <option value="100">100 Diamonds</option>
+            <option value="310">310 Diamonds</option>
+            <option value="520">520 Diamonds</option>
+            <option value="1060">1060 Diamonds</option>
+            <option value="2180">2180 Diamonds</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-send" id="sendBtn">Send Diamonds</button>
+          <div class="small-ghost" id="preview">Preview</div>
+        </div>
+
+        <div class="note">Tip: This is a front-end mock. Replace alert() with an API call to integrate with your server.</div>
+      </form>
+    </section>
+
+    <!-- Right: Transactions -->
+    <aside class="card">
+      <h2>Recent Transactions</h2>
+      <p>Latest diamond sends (demo data)</p>
+
+      <div class="transactions" id="txList">
+        <!-- Dummy items inserted by JS on load -->
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+        <div style="color:var(--muted);font-size:13px">Showing last 5</div>
+        <div style="font-weight:700;color:var(--accent1)">Total Sent: <span id="totalSent">0</span></div>
+      </div>
+    </aside>
+  </main>
+
+<!-- Success Popup -->
+<!-- <div id="successPopup" class="popup-overlay">
+  <div class="popup-content">
+    <div class="popup-icon">✓</div>
+    <div class="popup-text">
+      <h3>Diamonds Sent Successfully!</h3>
+      <p id="popupMessage">Diamonds have been sent to the player.</p>
+    </div>
+    <button class="popup-close" onclick="closeSuccessPopup()">×</button>
+  </div>
+</div> -->
+
+  <script>
+    // Dummy data for initial transactions
+    const dummy = [
+      {uid: '123456789', amount: 520, time: '2025-08-12 19:02'},
+      {uid: '987654321', amount: 310, time: '2025-08-12 18:22'},
+      {uid: '555123999', amount: 1060, time: '2025-08-11 09:41'},
+    ];
+
+    const txListEl = document.getElementById('txList');
+    const totalSentEl = document.getElementById('totalSent');
+
+    let transactions = [...dummy];
+
+    function formatDate(d){
+      // d is a Date
+      const pad = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function renderTransactions(){
+      txListEl.innerHTML = '';
+      let total = 0;
+      transactions.slice(0,5).forEach(tx => {
+        total += Number(tx.amount);
+        const item = document.createElement('div');
+        item.className = 'tx-item';
+        item.innerHTML = `
+          <div class="tx-left">
+            <div class="uid-chip">UID ${tx.uid}</div>
+            <div>
+              <div style="font-weight:700">${tx.amount} ♦</div>
+              <div class="tx-meta">${tx.time}</div>
+            </div>
+          </div>
+          <div style="font-weight:800;color:var(--accent2)">Success</div>
+        `;
+        txListEl.appendChild(item);
+      });
+      if(transactions.length===0){
+        txListEl.innerHTML = '<div class="empty">No transactions yet</div>';
+      }
+      totalSentEl.textContent = total;
+    }
+
+    // initial render
+    renderTransactions();
+
+    // Form behavior
+    const uidInput = document.getElementById('uid');
+    const amountSelect = document.getElementById('amount');
+    const sendBtn = document.getElementById('sendBtn');
+    const preview = document.getElementById('preview');
+
+    function updatePreview(){
+      const u = uidInput.value.trim() || '—';
+      const a = amountSelect.value;
+      preview.textContent = `UID: ${u} • ${a} ♦`;
+    }
+
+    uidInput.addEventListener('input', updatePreview);
+    amountSelect.addEventListener('change', updatePreview);
+    updatePreview();
+
+    // Success popup functions
+    function showSuccessPopup(uid, amount) {
+      const popup = document.getElementById('successPopup');
+      const message = document.getElementById('popupMessage');
+      message.textContent = `Diamonds sent successfully to UID ${uid} (${amount} ♦)`;
+      popup.classList.add('show');
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        closeSuccessPopup();
+      }, 3000);
+    }
+
+    function closeSuccessPopup() {
+      const popup = document.getElementById('successPopup');
+      popup.classList.remove('show');
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const uid = uidInput.value.trim();
+      const amount = amountSelect.value;
+      if(!uid){
+        alert('Please enter a valid Player UID.');
+        uidInput.focus();
+        return;
+      }
+
+      // Show success popup
+      showSuccessPopup(uid, amount);
+
+      // Add to transactions list
+      const now = new Date();
+      transactions.unshift({uid, amount: Number(amount), time: formatDate(now)});
+
+      // Keep only recent 50 entries in memory
+      if(transactions.length>50) transactions = transactions.slice(0,50);
+
+      renderTransactions();
+
+      // Reset form
+      uidInput.value = '';
+      amountSelect.value = '100';
+      updatePreview();
+    });
+
+    // Logout demo
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      // In real app, do sign-out then redirect
+      alert('Logged out (demo). Redirecting to login...');
+      // window.location.href = '/login';
+    });
+  </script>
+</body>
+</html>
+
 
